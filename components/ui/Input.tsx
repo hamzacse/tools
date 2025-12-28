@@ -37,7 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         const hasError = !!error;
 
         const inputStyles = `
-      w-full rounded-lg border bg-white 
+      w-full rounded-lg border bg-background 
       transition-all duration-200 
       placeholder:text-surface-400
       disabled:bg-surface-50 disabled:cursor-not-allowed
@@ -120,7 +120,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         const hasError = !!error;
 
         const textareaStyles = `
-      w-full rounded-lg border bg-white p-4
+      w-full rounded-lg border bg-background p-4
       transition-all duration-200 
       placeholder:text-surface-400
       disabled:bg-surface-50 disabled:cursor-not-allowed
@@ -183,7 +183,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         const hasError = !!error;
 
         const selectStyles = `
-      w-full h-11 rounded-lg border bg-white px-4 pr-10
+      w-full h-11 rounded-lg border bg-background px-4 pr-10
       transition-all duration-200 
       appearance-none cursor-pointer
       disabled:bg-surface-50 disabled:cursor-not-allowed

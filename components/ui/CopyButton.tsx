@@ -91,7 +91,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
             className={`
         inline-flex items-center justify-center gap-2
         h-10 px-4 rounded-lg
-        bg-white border border-surface-200
+        bg-background border border-surface-200
         text-sm font-medium text-surface-700
         hover:bg-surface-50 hover:border-surface-300
         transition-all duration-200

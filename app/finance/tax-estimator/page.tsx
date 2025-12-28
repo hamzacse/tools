@@ -78,7 +78,7 @@ export default function TaxEstimatorPage() {
                             {/* FAQ Section - Right below the tool */}
                             <FAQ items={faqItems} />
 
-                            <div className="mt-12 p-6 rounded-2xl bg-white border border-surface-200">
+                            <div className="mt-12 p-6 rounded-2xl bg-surface-50 border border-surface-200">
                                 <h2 className="text-xl font-semibold text-surface-900 mb-4">Understanding Your Tax Estimate</h2>
                                 <p className="text-surface-600 leading-relaxed mb-4">
                                     This tax estimator helps you understand how much tax you might owe based on your

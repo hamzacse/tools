@@ -41,7 +41,7 @@ export const BlogGrid = () => {
                     scroll={false}
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActiveCategory(null)
                             ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
-                            : 'bg-white border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
+                            : 'bg-surface-50 border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
                         }`}
                 >
                     All Posts
@@ -51,7 +51,7 @@ export const BlogGrid = () => {
                     scroll={false}
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActiveCategory('finance')
                             ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
-                            : 'bg-white border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
+                            : 'bg-surface-50 border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
                         }`}
                 >
                     Finance
@@ -61,7 +61,7 @@ export const BlogGrid = () => {
                     scroll={false}
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActiveCategory('development')
                             ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
-                            : 'bg-white border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
+                            : 'bg-surface-50 border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
                         }`}
                 >
                     Development
@@ -71,7 +71,7 @@ export const BlogGrid = () => {
                     scroll={false}
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActiveCategory('tips')
                             ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
-                            : 'bg-white border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
+                            : 'bg-surface-50 border border-surface-200 text-surface-600 hover:border-primary-300 hover:text-primary-600'
                         }`}
                 >
                     Tips & Guides
@@ -83,7 +83,7 @@ export const BlogGrid = () => {
                 {filteredPosts.map((post) => (
                     <article
                         key={post.slug}
-                        className="group bg-white rounded-2xl border border-surface-200 overflow-hidden hover:shadow-xl hover:border-primary-200 transition-all duration-300 transform hover:-translate-y-1"
+                        className="group bg-surface-50 rounded-2xl border border-surface-200 overflow-hidden hover:shadow-xl hover:border-primary-200 transition-all duration-300 transform hover:-translate-y-1"
                     >
                         <Link href={`/blog/${post.slug}`}>
                             {/* Thumbnail */}
@@ -137,7 +137,7 @@ export const BlogGrid = () => {
 
             {/* Empty State */}
             {filteredPosts.length === 0 && (
-                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-surface-300">
+                <div className="text-center py-20 bg-surface-50 rounded-3xl border border-dashed border-surface-300">
                     <div className="text-5xl mb-4">🔍</div>
                     <p className="text-surface-900 font-semibold text-xl mb-2">No posts found</p>
                     <p className="text-surface-500 mb-6">We couldn&apos;t find any articles in this category.</p>

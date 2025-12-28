@@ -31,7 +31,7 @@ export default function BlogPage() {
                 <Suspense fallback={
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl border border-surface-200 p-6">
+                            <div key={i} className="bg-surface-50 rounded-2xl border border-surface-200 p-6">
                                 <Skeleton className="h-48 w-full rounded-xl mb-6" />
                                 <Skeleton className="h-6 w-3/4 mb-4" />
                                 <Skeleton className="h-4 w-full mb-2" />

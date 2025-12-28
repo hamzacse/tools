@@ -14,8 +14,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         const baseStyles = 'rounded-xl transition-all duration-200';
 
         const variantStyles = {
-            default: 'bg-white border border-surface-200',
-            elevated: 'bg-white shadow-md',
+            default: 'bg-background dark:bg-surface-100 border border-surface-200',
+            elevated: 'bg-background dark:bg-surface-100 shadow-md dark:shadow-none dark:border dark:border-surface-200',
             outlined: 'bg-transparent border-2 border-surface-200',
         };
 

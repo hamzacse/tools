@@ -272,7 +272,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </header>
 
                 {/* Content */}
-                <div className="bg-white rounded-2xl border border-surface-200 p-6 md:p-10 mb-12 shadow-sm">
+                <div className="bg-surface-50 rounded-2xl border border-surface-200 p-6 md:p-10 mb-12 shadow-sm">
                     <div className="prose prose-surface max-w-none">
                         {renderContent(post.content)}
                     </div>
@@ -288,7 +288,7 @@ export default async function BlogPostPage({ params }: Props) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {post.relatedTools.map((tool) => (
                                 <Link key={tool.href} href={tool.href} className="group">
-                                    <div className="flex items-center gap-4 p-4 bg-white border border-surface-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all duration-300">
+                                    <div className="flex items-center gap-4 p-4 bg-surface-50 border border-surface-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all duration-300">
                                         <div className="w-12 h-12 flex items-center justify-center bg-surface-50 rounded-lg text-2xl group-hover:bg-primary-50 transition-colors">
                                             {tool.icon}
                                         </div>
@@ -321,7 +321,7 @@ export default async function BlogPostPage({ params }: Props) {
                     <div className="flex flex-wrap justify-center gap-4">
                         <Link
                             href="/finance/loan-calculator"
-                            className="px-6 py-2.5 rounded-lg bg-white text-primary-600 font-medium hover:bg-primary-50 transition-colors"
+                            className="px-6 py-2.5 rounded-lg bg-surface-50 text-primary-600 font-medium hover:bg-primary-50 transition-colors"
                         >
                             Loan Calculator
                         </Link>
@@ -346,7 +346,7 @@ export default async function BlogPostPage({ params }: Props) {
                                 <Link
                                     key={relatedPost.slug}
                                     href={`/blog/${relatedPost.slug}`}
-                                    className="group block p-6 bg-white rounded-xl border border-surface-200 hover:border-primary-200 hover:shadow-md transition-all"
+                                    className="group block p-6 bg-surface-50 rounded-xl border border-surface-200 hover:border-primary-200 hover:shadow-md transition-all"
                                 >
                                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${categoryColors[relatedPost.category]} mb-3`}>
                                         {categoryLabels[relatedPost.category]}

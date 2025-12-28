@@ -12,6 +12,7 @@ import {
     type SalaryComponent,
     type SalaryResult
 } from '@/lib/calculations/salary';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 export const SalaryCalculator: React.FC = () => {
     const [grossSalary, setGrossSalary] = useState<string>('5000');
@@ -123,7 +124,7 @@ export const SalaryCalculator: React.FC = () => {
             <select
                 value={item.type}
                 onChange={(e) => onUpdate(item.id, 'type', e.target.value)}
-                className="h-9 px-2 rounded-lg border border-surface-200 bg-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                className="h-9 px-2 rounded-lg border border-surface-200 bg-background text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
             >
                 <option value="fixed">Fixed</option>
                 <option value="percentage">%</option>
@@ -166,7 +167,7 @@ export const SalaryCalculator: React.FC = () => {
                         <select
                             value={currency}
                             onChange={(e) => setCurrency(e.target.value)}
-                            className="h-11 px-3 rounded-lg border border-surface-200 bg-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                            className="h-11 px-3 rounded-lg border border-surface-200 bg-background text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                             <option value="USD">$</option>
                             <option value="EUR">€</option>
@@ -186,8 +187,8 @@ export const SalaryCalculator: React.FC = () => {
                                 type="button"
                                 onClick={() => setPeriod('monthly')}
                                 className={`px-3 py-2 text-sm font-medium transition-colors ${period === 'monthly'
-                                        ? 'bg-primary-500 text-white'
-                                        : 'bg-white text-surface-600 hover:bg-surface-50'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-background text-surface-600 hover:bg-surface-50'
                                     }`}
                             >
                                 Monthly
@@ -196,8 +197,8 @@ export const SalaryCalculator: React.FC = () => {
                                 type="button"
                                 onClick={() => setPeriod('yearly')}
                                 className={`px-3 py-2 text-sm font-medium transition-colors ${period === 'yearly'
-                                        ? 'bg-primary-500 text-white'
-                                        : 'bg-white text-surface-600 hover:bg-surface-50'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-background text-surface-600 hover:bg-surface-50'
                                     }`}
                             >
                                 Yearly
@@ -273,14 +274,22 @@ export const SalaryCalculator: React.FC = () => {
                 <CardResults>
                     <div className="space-y-6">
                         {/* Net Salary Highlight */}
-                        <div className="p-6 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-center">
-                            <p className="text-sm opacity-90 mb-1">Monthly Net Salary</p>
-                            <p className="text-4xl font-bold">
-                                {formatCurrency(result.monthlyNet, currency)}
-                            </p>
-                            <p className="text-sm opacity-75 mt-2">
-                                {formatCurrency(result.yearlyNet, currency)} / year
-                            </p>
+                        <div className="p-6 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white relative overflow-hidden">
+                            <div className="relative z-10 text-center">
+                                <p className="text-sm opacity-90 mb-1">Monthly Net Salary</p>
+                                <div className="flex items-center justify-center gap-2">
+                                    <p className="text-4xl font-bold">
+                                        {formatCurrency(result.monthlyNet, currency)}
+                                    </p>
+                                    <CopyButton text={result.monthlyNet.toFixed(2)} variant="icon" className="text-white hover:bg-white/10 hover:text-white h-8 w-8" />
+                                </div>
+                                <p className="text-sm opacity-75 mt-2">
+                                    {formatCurrency(result.yearlyNet, currency)} / year
+                                </p>
+                            </div>
+                            {/* Decorative background elements */}
+                            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                            <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
                         </div>
 
                         {/* Summary */}

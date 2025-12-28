@@ -11,6 +11,7 @@ import {
     type LoanInput,
     type LoanResult
 } from '@/lib/calculations/loan';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 export const LoanCalculator: React.FC = () => {
     const [principal, setPrincipal] = useState<string>('100000');
@@ -78,7 +79,7 @@ export const LoanCalculator: React.FC = () => {
                         <select
                             value={currency}
                             onChange={(e) => setCurrency(e.target.value)}
-                            className="h-11 px-3 rounded-lg border border-surface-200 bg-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                            className="h-11 px-3 rounded-lg border border-surface-200 bg-background text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                             <option value="USD">$</option>
                             <option value="EUR">€</option>
@@ -133,8 +134,8 @@ export const LoanCalculator: React.FC = () => {
                                 type="button"
                                 onClick={() => setTenureType('years')}
                                 className={`px-4 py-2 text-sm font-medium transition-colors ${tenureType === 'years'
-                                        ? 'bg-primary-500 text-white'
-                                        : 'bg-white text-surface-600 hover:bg-surface-50'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-background text-surface-600 hover:bg-surface-50'
                                     }`}
                             >
                                 Years
@@ -143,8 +144,8 @@ export const LoanCalculator: React.FC = () => {
                                 type="button"
                                 onClick={() => setTenureType('months')}
                                 className={`px-4 py-2 text-sm font-medium transition-colors ${tenureType === 'months'
-                                        ? 'bg-primary-500 text-white'
-                                        : 'bg-white text-surface-600 hover:bg-surface-50'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-background text-surface-600 hover:bg-surface-50'
                                     }`}
                             >
                                 Months
@@ -167,9 +168,12 @@ export const LoanCalculator: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left: Numbers */}
                         <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-primary-50 border border-primary-100">
-                                <p className="text-sm text-primary-600 mb-1">Monthly EMI</p>
-                                <p className="text-3xl font-bold text-primary-700">
+                            <div className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800">
+                                <div className="flex items-center justify-between mb-1">
+                                    <p className="text-sm text-primary-600">Monthly EMI</p>
+                                    <CopyButton text={result.emi.toFixed(2)} variant="icon" className="h-7 w-7" />
+                                </div>
+                                <p className="text-3xl font-bold text-primary-700 dark:text-primary-400">
                                     {formatCurrency(result.emi, currency)}
                                 </p>
                             </div>

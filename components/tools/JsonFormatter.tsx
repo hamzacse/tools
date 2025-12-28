@@ -74,8 +74,8 @@ export const JsonFormatter: React.FC = () => {
                             type="button"
                             onClick={() => setMode('format')}
                             className={`px-4 py-2 text-sm font-medium transition-colors ${mode === 'format'
-                                    ? 'bg-primary-500 text-white'
-                                    : 'bg-white text-surface-600 hover:bg-surface-50'
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-background text-surface-600 hover:bg-surface-50'
                                 }`}
                         >
                             Format
@@ -84,8 +84,8 @@ export const JsonFormatter: React.FC = () => {
                             type="button"
                             onClick={() => setMode('minify')}
                             className={`px-4 py-2 text-sm font-medium transition-colors ${mode === 'minify'
-                                    ? 'bg-primary-500 text-white'
-                                    : 'bg-white text-surface-600 hover:bg-surface-50'
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-background text-surface-600 hover:bg-surface-50'
                                 }`}
                         >
                             Minify
@@ -98,7 +98,7 @@ export const JsonFormatter: React.FC = () => {
                             <select
                                 value={indentSize}
                                 onChange={(e) => setIndentSize(parseInt(e.target.value))}
-                                className="h-9 px-3 rounded-lg border border-surface-200 bg-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                                className="h-9 px-3 rounded-lg border border-surface-200 bg-background text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                             >
                                 <option value={2}>2 spaces</option>
                                 <option value={4}>4 spaces</option>

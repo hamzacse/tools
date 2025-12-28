@@ -42,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         shadow-sm hover:shadow-md
       `,
             secondary: `
-        bg-white border border-surface-200 
+        bg-background border border-surface-200 
         text-surface-700 
         hover:bg-surface-50 hover:border-surface-300
         focus-visible:ring-primary-500
@@ -138,7 +138,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         focus-visible:ring-primary-500
       `,
             secondary: `
-        bg-white border border-surface-200 
+        bg-background border border-surface-200 
         text-surface-600 
         hover:bg-surface-50 hover:text-surface-900
         focus-visible:ring-primary-500

@@ -16,6 +16,8 @@ const devTools = [
     { name: 'Regex Tester', href: '/dev/regex-tester', icon: '🔍' },
 ];
 
+import { ThemeToggle } from './ThemeToggle';
+
 export const Header: React.FC = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -30,14 +32,14 @@ export const Header: React.FC = () => {
                     {/* Logo */}
                     <Link
                         href="/"
-                        className="flex items-center gap-2 text-xl font-bold"
+                        className="flex items-center gap-2 text-xl font-bold transition-transform hover:scale-105"
                     >
                         <span className="text-2xl">⚡</span>
                         <span className="gradient-text">ToolForge</span>
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-1">
+                    <nav className="hidden md:flex items-center gap-2">
                         {/* Finance Dropdown */}
                         <div
                             className="relative"
@@ -49,7 +51,7 @@ export const Header: React.FC = () => {
                   flex items-center gap-1 px-4 py-2 rounded-lg
                   text-sm font-medium transition-colors
                   ${isActive('/finance')
-                                        ? 'text-primary-600 bg-primary-50'
+                                        ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
                                         : 'text-surface-600 hover:text-surface-900 hover:bg-surface-100'
                                     }
                 `}
@@ -65,7 +67,7 @@ export const Header: React.FC = () => {
                                 </svg>
                             </button>
                             {activeDropdown === 'finance' && (
-                                <div className="absolute top-full left-0 mt-1 w-56 py-2 bg-white rounded-xl shadow-lg border border-surface-200 animate-fade-in">
+                                <div className="absolute top-full left-0 mt-1 w-56 py-2 bg-surface-50 dark:bg-surface-800 rounded-xl shadow-lg border border-surface-200 animate-fade-in">
                                     {financeTools.map((tool) => (
                                         <Link
                                             key={tool.href}
@@ -74,8 +76,8 @@ export const Header: React.FC = () => {
                         flex items-center gap-3 px-4 py-2.5 text-sm
                         transition-colors
                         ${isActive(tool.href)
-                                                    ? 'text-primary-600 bg-primary-50'
-                                                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50'
+                                                    ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                                                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50 dark:hover:bg-surface-700'
                                                 }
                       `}
                                         >
@@ -98,7 +100,7 @@ export const Header: React.FC = () => {
                   flex items-center gap-1 px-4 py-2 rounded-lg
                   text-sm font-medium transition-colors
                   ${isActive('/dev')
-                                        ? 'text-primary-600 bg-primary-50'
+                                        ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
                                         : 'text-surface-600 hover:text-surface-900 hover:bg-surface-100'
                                     }
                 `}
@@ -114,7 +116,7 @@ export const Header: React.FC = () => {
                                 </svg>
                             </button>
                             {activeDropdown === 'dev' && (
-                                <div className="absolute top-full left-0 mt-1 w-56 py-2 bg-white rounded-xl shadow-lg border border-surface-200 animate-fade-in">
+                                <div className="absolute top-full left-0 mt-1 w-56 py-2 bg-surface-50 dark:bg-surface-800 rounded-xl shadow-lg border border-surface-200 animate-fade-in">
                                     {devTools.map((tool) => (
                                         <Link
                                             key={tool.href}
@@ -123,8 +125,8 @@ export const Header: React.FC = () => {
                         flex items-center gap-3 px-4 py-2.5 text-sm
                         transition-colors
                         ${isActive(tool.href)
-                                                    ? 'text-primary-600 bg-primary-50'
-                                                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50'
+                                                    ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                                                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50 dark:hover:bg-surface-700'
                                                 }
                       `}
                                         >
@@ -142,31 +144,38 @@ export const Header: React.FC = () => {
                             className={`
                   px-4 py-2 rounded-lg text-sm font-medium transition-colors
                   ${isActive('/blog')
-                                    ? 'text-primary-600 bg-primary-50'
+                                    ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
                                     : 'text-surface-600 hover:text-surface-900 hover:bg-surface-100'
                                 }
                 `}
                         >
                             Blog
                         </Link>
+
+                        <div className="ml-4 pl-4 border-l border-surface-200">
+                            <ThemeToggle />
+                        </div>
                     </nav>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        className="md:hidden p-2 rounded-lg text-surface-600 hover:bg-surface-100"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        {mobileMenuOpen ? (
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        ) : (
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        )}
-                    </button>
+                    {/* Mobile menu and toggle */}
+                    <div className="flex items-center gap-2 md:hidden">
+                        <ThemeToggle />
+                        <button
+                            className="p-2 rounded-lg text-surface-600 hover:bg-surface-100"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            aria-label="Toggle menu"
+                        >
+                            {mobileMenuOpen ? (
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            ) : (
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
@@ -184,8 +193,8 @@ export const Header: React.FC = () => {
                                     className={`
                     flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm
                     ${isActive(tool.href)
-                                            ? 'text-primary-600 bg-primary-50'
-                                            : 'text-surface-600 hover:bg-surface-50'
+                                            ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                                            : 'text-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'
                                         }
                   `}
                                 >
@@ -206,8 +215,8 @@ export const Header: React.FC = () => {
                                     className={`
                     flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm
                     ${isActive(tool.href)
-                                            ? 'text-primary-600 bg-primary-50'
-                                            : 'text-surface-600 hover:bg-surface-50'
+                                            ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                                            : 'text-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'
                                         }
                   `}
                                 >
@@ -223,8 +232,8 @@ export const Header: React.FC = () => {
                                 className={`
                     flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm
                     ${isActive('/blog')
-                                        ? 'text-primary-600 bg-primary-50'
-                                        : 'text-surface-600 hover:bg-surface-50'
+                                        ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                                        : 'text-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'
                                     }
                   `}
                             >

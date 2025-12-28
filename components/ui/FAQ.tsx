@@ -26,7 +26,7 @@ export const FAQ: React.FC<FAQProps> = ({ items, title = "Frequently Asked Quest
                 {items.map((item, index) => (
                     <div
                         key={index}
-                        className="rounded-xl border border-surface-200 overflow-hidden bg-white"
+                        className="rounded-xl border border-surface-200 overflow-hidden bg-surface-50"
                     >
                         <button
                             onClick={() => toggleItem(index)}

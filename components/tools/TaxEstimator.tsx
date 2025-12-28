@@ -12,6 +12,7 @@ import {
     type TaxConfig,
     type TaxResult
 } from '@/lib/calculations/tax';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 export const TaxEstimator: React.FC = () => {
     const [income, setIncome] = useState<string>('75000');
@@ -67,7 +68,7 @@ export const TaxEstimator: React.FC = () => {
                     <select
                         value={selectedCountry}
                         onChange={(e) => setSelectedCountry(e.target.value)}
-                        className="w-full h-11 px-4 rounded-lg border border-surface-200 bg-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                        className="w-full h-11 px-4 rounded-lg border border-surface-200 bg-background text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                     >
                         {Object.entries(taxConfigs).map(([key, cfg]) => (
                             <option key={key} value={key}>{cfg.name}</option>
@@ -121,21 +122,24 @@ export const TaxEstimator: React.FC = () => {
                     <div className="space-y-6">
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="p-4 rounded-xl bg-error-50 border border-error-100">
-                                <p className="text-sm text-error-600 mb-1">Estimated Tax</p>
-                                <p className="text-2xl font-bold text-error-700">
+                            <div className="p-4 rounded-xl bg-error-50 dark:bg-error-900/10 border border-error-100 dark:border-error-800">
+                                <div className="flex items-center justify-between mb-1">
+                                    <p className="text-sm text-error-600">Estimated Tax</p>
+                                    <CopyButton text={result.taxAmount.toFixed(2)} variant="icon" className="h-7 w-7" />
+                                </div>
+                                <p className="text-2xl font-bold text-error-700 dark:text-error-400">
                                     {formatTaxCurrency(result.taxAmount, config.currency)}
                                 </p>
                             </div>
-                            <div className="p-4 rounded-xl bg-success-50 border border-success-100">
+                            <div className="p-4 rounded-xl bg-success-50 dark:bg-success-900/10 border border-success-100 dark:border-success-800">
                                 <p className="text-sm text-success-600 mb-1">Net Income</p>
-                                <p className="text-2xl font-bold text-success-700">
+                                <p className="text-2xl font-bold text-success-700 dark:text-success-400">
                                     {formatTaxCurrency(result.netIncome, config.currency)}
                                 </p>
                             </div>
-                            <div className="p-4 rounded-xl bg-primary-50 border border-primary-100">
+                            <div className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800">
                                 <p className="text-sm text-primary-600 mb-1">Effective Rate</p>
-                                <p className="text-2xl font-bold text-primary-700">
+                                <p className="text-2xl font-bold text-primary-700 dark:text-primary-400">
                                     {result.effectiveRate.toFixed(2)}%
                                 </p>
                             </div>

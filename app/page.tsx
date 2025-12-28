@@ -52,7 +52,7 @@ const devTools = [
 const ToolCard = ({ tool }: { tool: typeof financeTools[0] }) => (
   <Link
     href={tool.href}
-    className="group block p-6 bg-white rounded-2xl border border-surface-200 hover:border-primary-300 hover:shadow-lg transition-all duration-300"
+    className="group block p-6 bg-surface-50 rounded-2xl border border-surface-200 hover:border-primary-300 hover:shadow-lg transition-all duration-300"
   >
     <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
       {tool.icon}
@@ -76,7 +76,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-white to-white">
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-background to-background">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full blur-3xl opacity-50" />
@@ -102,7 +102,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="#dev-tools"
-                className="inline-flex items-center px-6 py-3 rounded-xl bg-white border border-surface-200 text-surface-700 font-medium hover:bg-surface-50 hover:border-surface-300 transition-all"
+                className="inline-flex items-center px-6 py-3 rounded-xl bg-background border border-surface-200 text-surface-700 font-medium hover:bg-surface-50 hover:border-surface-300 transition-all"
               >
                 Developer Tools
               </Link>
@@ -135,11 +135,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-surface-900 mb-4">
-              Finance Tools
+              Finance & Tax Calculators
             </h2>
             <p className="text-lg text-surface-600 max-w-2xl mx-auto">
-              Make informed financial decisions with our accurate calculators.
-              Plan loans, estimate taxes, and understand your salary.
+              Our accurate financial calculators help you stay on top of your money.
+              From planning loan repayments to estimating complex tax liabilities,
+              ToolForge provides the precision you need for smarter financial planning.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -155,11 +156,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-surface-900 mb-4">
-              Developer Tools
+              Essential Developer Utilities
             </h2>
             <p className="text-lg text-surface-600 max-w-2xl mx-auto">
-              Essential utilities for developers. Format JSON, decode JWTs,
-              and test regex patterns - all in your browser.
+              Streamline your workflow with our developer-first tools.
+              Quickly format JSON data, decode JWT tokens, and test your
+              regular expressions—all processed locally for maximum privacy.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
