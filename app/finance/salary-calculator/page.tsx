@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SalaryCalculator } from '@/components/tools/SalaryCalculator';
+import { SalaryCalculator } from '@/components/tools/DynamicTools';
 import { FAQ } from '@/components/ui/FAQ';
 import { AdSection } from '@/components/ui/AdPlaceholder';
 
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
         description: 'Calculate your net salary with allowances and deductions. Free online calculator.',
     },
 };
+
+export const revalidate = 86400; // 24 hours
 
 const faqItems = [
     {

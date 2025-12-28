@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardResults } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { InfoTooltip } from '@/components/ui/Tooltip';
 import {
     calculateLoan,
@@ -20,10 +21,15 @@ export const LoanCalculator: React.FC = () => {
     const [tenureType, setTenureType] = useState<'months' | 'years'>('years');
     const [currency, setCurrency] = useState<string>('USD');
 
+    // Debounce inputs to improve INP
+    const debouncedPrincipal = useDebounce(principal, 300);
+    const debouncedInterestRate = useDebounce(interestRate, 300);
+    const debouncedTenure = useDebounce(tenure, 300);
+
     const result = useMemo<LoanResult | null>(() => {
-        const principalNum = parseFloat(principal);
-        const rateNum = parseFloat(interestRate);
-        const tenureNum = parseFloat(tenure);
+        const principalNum = parseFloat(debouncedPrincipal);
+        const rateNum = parseFloat(debouncedInterestRate);
+        const tenureNum = parseFloat(debouncedTenure);
 
         if (isNaN(principalNum) || isNaN(rateNum) || isNaN(tenureNum)) {
             return null;
@@ -41,7 +47,7 @@ export const LoanCalculator: React.FC = () => {
         };
 
         return calculateLoan(input);
-    }, [principal, interestRate, tenure, tenureType]);
+    }, [debouncedPrincipal, debouncedInterestRate, debouncedTenure, tenureType]);
 
     const handleReset = () => {
         setPrincipal('100000');
@@ -163,85 +169,87 @@ export const LoanCalculator: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            {result && (
-                <CardResults>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Left: Numbers */}
-                        <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800">
-                                <div className="flex items-center justify-between mb-1">
-                                    <p className="text-sm text-primary-600">Monthly EMI</p>
-                                    <CopyButton text={result.emi.toFixed(2)} variant="icon" className="h-7 w-7" />
-                                </div>
-                                <p className="text-3xl font-bold text-primary-700 dark:text-primary-400">
-                                    {formatCurrency(result.emi, currency)}
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 rounded-xl bg-surface-50">
-                                    <p className="text-sm text-surface-500 mb-1">Total Interest</p>
-                                    <p className="text-xl font-semibold text-surface-900">
-                                        {formatCurrency(result.totalInterest, currency)}
+            <div className="min-h-[280px]">
+                {result && (
+                    <CardResults>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Left: Numbers */}
+                            <div className="space-y-4">
+                                <div className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <p className="text-sm text-primary-600">Monthly EMI</p>
+                                        <CopyButton text={result.emi.toFixed(2)} variant="icon" className="h-7 w-7" />
+                                    </div>
+                                    <p className="text-3xl font-bold text-primary-700 dark:text-primary-400">
+                                        {formatCurrency(result.emi, currency)}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-xl bg-surface-50">
-                                    <p className="text-sm text-surface-500 mb-1">Total Payable</p>
-                                    <p className="text-xl font-semibold text-surface-900">
-                                        {formatCurrency(result.totalPayable, currency)}
-                                    </p>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-xl bg-surface-50">
+                                        <p className="text-sm text-surface-500 mb-1">Total Interest</p>
+                                        <p className="text-xl font-semibold text-surface-900">
+                                            {formatCurrency(result.totalInterest, currency)}
+                                        </p>
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-surface-50">
+                                        <p className="text-sm text-surface-500 mb-1">Total Payable</p>
+                                        <p className="text-xl font-semibold text-surface-900">
+                                            {formatCurrency(result.totalPayable, currency)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Visual */}
+                            <div className="flex items-center justify-center">
+                                <div className="relative w-40 h-40">
+                                    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                                        {/* Background circle */}
+                                        <circle
+                                            cx="50"
+                                            cy="50"
+                                            r="40"
+                                            fill="none"
+                                            stroke="#e4e4e7"
+                                            strokeWidth="12"
+                                        />
+                                        {/* Principal portion */}
+                                        <circle
+                                            cx="50"
+                                            cy="50"
+                                            r="40"
+                                            fill="none"
+                                            stroke="#6366f1"
+                                            strokeWidth="12"
+                                            strokeDasharray={`${principalPercent * 2.51} ${251 - principalPercent * 2.51}`}
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span className="text-xs text-surface-500">Principal</span>
+                                        <span className="text-lg font-semibold text-surface-900">
+                                            {principalPercent.toFixed(1)}%
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right: Visual */}
-                        <div className="flex items-center justify-center">
-                            <div className="relative w-40 h-40">
-                                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                                    {/* Background circle */}
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r="40"
-                                        fill="none"
-                                        stroke="#e4e4e7"
-                                        strokeWidth="12"
-                                    />
-                                    {/* Principal portion */}
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r="40"
-                                        fill="none"
-                                        stroke="#6366f1"
-                                        strokeWidth="12"
-                                        strokeDasharray={`${principalPercent * 2.51} ${251 - principalPercent * 2.51}`}
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-xs text-surface-500">Principal</span>
-                                    <span className="text-lg font-semibold text-surface-900">
-                                        {principalPercent.toFixed(1)}%
-                                    </span>
-                                </div>
+                        {/* Legend */}
+                        <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-surface-100">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-primary-500" />
+                                <span className="text-sm text-surface-600">Principal</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-surface-200" />
+                                <span className="text-sm text-surface-600">Interest</span>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Legend */}
-                    <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-surface-100">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-primary-500" />
-                            <span className="text-sm text-surface-600">Principal</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-surface-200" />
-                            <span className="text-sm text-surface-600">Interest</span>
-                        </div>
-                    </div>
-                </CardResults>
-            )}
+                    </CardResults>
+                )}
+            </div>
 
             {/* Disclaimer */}
             <div className="mt-6 p-4 rounded-lg bg-warning-50 border border-warning-500/20">

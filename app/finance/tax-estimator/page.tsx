@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TaxEstimator } from '@/components/tools/TaxEstimator';
+import { TaxEstimator } from '@/components/tools/DynamicTools';
 import { FAQ } from '@/components/ui/FAQ';
 import { AdSection } from '@/components/ui/AdPlaceholder';
 
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
         description: 'Estimate your income tax with our free online calculator. Supports multiple countries.',
     },
 };
+
+export const revalidate = 86400; // 24 hours
 
 const faqItems = [
     {

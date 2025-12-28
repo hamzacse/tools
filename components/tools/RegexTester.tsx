@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardResults } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { InfoTooltip } from '@/components/ui/Tooltip';
 import {
     testRegex,
@@ -25,13 +26,17 @@ export const RegexTester: React.FC = () => {
         unicode: false,
     });
 
+    // Debounce inputs to improve INP
+    const debouncedPattern = useDebounce(pattern, 400);
+    const debouncedTestString = useDebounce(testString, 400);
+
     const result = useMemo<RegexResult>(() => {
-        return testRegex(pattern, testString, flags);
-    }, [pattern, testString, flags]);
+        return testRegex(debouncedPattern, debouncedTestString, flags);
+    }, [debouncedPattern, debouncedTestString, flags]);
 
     const patternValidation = useMemo(() => {
-        return validatePattern(pattern);
-    }, [pattern]);
+        return validatePattern(debouncedPattern);
+    }, [debouncedPattern]);
 
     const toggleFlag = (flag: keyof RegexFlags) => {
         setFlags(prev => ({ ...prev, [flag]: !prev[flag] }));
@@ -170,81 +175,83 @@ export const RegexTester: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            {testString && (
-                <CardResults>
-                    <div className="space-y-4">
-                        {/* Match Count */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <span className={`
+            <div className="min-h-[300px]">
+                {testString && (
+                    <CardResults>
+                        <div className="space-y-4">
+                            {/* Match Count */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className={`
                   inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                   ${result.matchCount > 0
-                                        ? 'bg-success-100 text-success-700'
-                                        : 'bg-surface-100 text-surface-600'
-                                    }
+                                            ? 'bg-success-100 text-success-700'
+                                            : 'bg-surface-100 text-surface-600'
+                                        }
                 `}>
-                                    {result.matchCount} match{result.matchCount !== 1 ? 'es' : ''}
-                                </span>
-                                {result.error && (
-                                    <span className="text-sm text-error-500">
-                                        {result.error}
+                                        {result.matchCount} match{result.matchCount !== 1 ? 'es' : ''}
                                     </span>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Highlighted Output */}
-                        <div>
-                            <h4 className="text-sm font-semibold text-surface-900 mb-2">Highlighted Text</h4>
-                            <div
-                                className="p-4 rounded-xl bg-surface-50 border border-surface-200 text-sm whitespace-pre-wrap font-mono leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: result.highlightedText }}
-                            />
-                        </div>
-
-                        {/* Match Details */}
-                        {result.matches.length > 0 && (
-                            <div>
-                                <h4 className="text-sm font-semibold text-surface-900 mb-2">Match Details</h4>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="bg-surface-50">
-                                                <th className="text-left py-2 px-3 font-medium text-surface-600">#</th>
-                                                <th className="text-left py-2 px-3 font-medium text-surface-600">Match</th>
-                                                <th className="text-right py-2 px-3 font-medium text-surface-600">Index</th>
-                                                <th className="text-right py-2 px-3 font-medium text-surface-600">Length</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {result.matches.slice(0, 20).map((match, index) => (
-                                                <tr key={index} className="border-b border-surface-100">
-                                                    <td className="py-2 px-3 text-surface-400">{index + 1}</td>
-                                                    <td className="py-2 px-3 font-mono">
-                                                        <span className="bg-yellow-200 text-yellow-900 px-1 rounded">
-                                                            {match.match.length > 50
-                                                                ? match.match.substring(0, 50) + '...'
-                                                                : match.match
-                                                            }
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-2 px-3 text-right text-surface-600">{match.index}</td>
-                                                    <td className="py-2 px-3 text-right text-surface-600">{match.length}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    {result.matches.length > 20 && (
-                                        <p className="text-sm text-surface-500 mt-2 text-center">
-                                            Showing first 20 of {result.matches.length} matches
-                                        </p>
+                                    {result.error && (
+                                        <span className="text-sm text-error-500">
+                                            {result.error}
+                                        </span>
                                     )}
                                 </div>
                             </div>
-                        )}
-                    </div>
-                </CardResults>
-            )}
+
+                            {/* Highlighted Output */}
+                            <div>
+                                <h4 className="text-sm font-semibold text-surface-900 mb-2">Highlighted Text</h4>
+                                <div
+                                    className="p-4 rounded-xl bg-surface-50 border border-surface-200 text-sm whitespace-pre-wrap font-mono leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: result.highlightedText }}
+                                />
+                            </div>
+
+                            {/* Match Details */}
+                            {result.matches.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-semibold text-surface-900 mb-2">Match Details</h4>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="bg-surface-50">
+                                                    <th className="text-left py-2 px-3 font-medium text-surface-600">#</th>
+                                                    <th className="text-left py-2 px-3 font-medium text-surface-600">Match</th>
+                                                    <th className="text-right py-2 px-3 font-medium text-surface-600">Index</th>
+                                                    <th className="text-right py-2 px-3 font-medium text-surface-600">Length</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {result.matches.slice(0, 20).map((match, index) => (
+                                                    <tr key={index} className="border-b border-surface-100">
+                                                        <td className="py-2 px-3 text-surface-400">{index + 1}</td>
+                                                        <td className="py-2 px-3 font-mono">
+                                                            <span className="bg-yellow-200 text-yellow-900 px-1 rounded">
+                                                                {match.match.length > 50
+                                                                    ? match.match.substring(0, 50) + '...'
+                                                                    : match.match
+                                                                }
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-2 px-3 text-right text-surface-600">{match.index}</td>
+                                                        <td className="py-2 px-3 text-right text-surface-600">{match.length}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        {result.matches.length > 20 && (
+                                            <p className="text-sm text-surface-500 mt-2 text-center">
+                                                Showing first 20 of {result.matches.length} matches
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </CardResults>
+                )}
+            </div>
         </Card>
     );
 };

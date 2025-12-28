@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LoanCalculator } from '@/components/tools/LoanCalculator';
+import { LoanCalculator } from '@/components/tools/DynamicTools';
 import { FAQ } from '@/components/ui/FAQ';
 import { AdSection } from '@/components/ui/AdPlaceholder';
 
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
         description: 'Calculate your loan EMI, total interest, and payment schedule instantly. Free online calculator.',
     },
 };
+
+export const revalidate = 86400; // 24 hours
 
 const faqItems = [
     {

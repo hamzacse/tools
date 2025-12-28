@@ -5,6 +5,7 @@ import { Card, CardHeader, CardResults } from '@/components/ui/Card';
 import { Textarea } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { CopyButton } from '@/components/ui/CopyButton';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import {
     formatJson,
     minifyJson,
@@ -17,12 +18,15 @@ export const JsonFormatter: React.FC = () => {
     const [indentSize, setIndentSize] = useState<number>(2);
     const [mode, setMode] = useState<'format' | 'minify'>('format');
 
+    // Debounce input to improve INP
+    const debouncedInput = useDebounce(input, 400);
+
     const result = useMemo<JsonResult>(() => {
-        if (!input.trim()) {
+        if (!debouncedInput.trim()) {
             return { success: true, formatted: '' };
         }
-        return mode === 'format' ? formatJson(input, indentSize) : minifyJson(input);
-    }, [input, indentSize, mode]);
+        return mode === 'format' ? formatJson(debouncedInput, indentSize) : minifyJson(debouncedInput);
+    }, [debouncedInput, indentSize, mode]);
 
     const stats = useMemo(() => {
         if (result.success && result.formatted) {
@@ -148,52 +152,54 @@ export const JsonFormatter: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            {result.success && result.formatted && (
-                <CardResults>
-                    <div className="space-y-4">
-                        {/* Stats */}
-                        {stats && (
-                            <div className="flex flex-wrap gap-4 mb-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-surface-500">Keys:</span>
-                                    <span className="text-sm font-medium text-surface-700">{stats.keys}</span>
+            <div className="min-h-[200px]">
+                {result.success && result.formatted && (
+                    <CardResults>
+                        <div className="space-y-4">
+                            {/* Stats */}
+                            {stats && (
+                                <div className="flex flex-wrap gap-4 mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-surface-500">Keys:</span>
+                                        <span className="text-sm font-medium text-surface-700">{stats.keys}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-surface-500">Depth:</span>
+                                        <span className="text-sm font-medium text-surface-700">{stats.depth}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-surface-500">Size:</span>
+                                        <span className="text-sm font-medium text-surface-700">{stats.size}</span>
+                                    </div>
+                                    <div className="flex-1" />
+                                    <CopyButton text={result.formatted} variant="full" />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-surface-500">Depth:</span>
-                                    <span className="text-sm font-medium text-surface-700">{stats.depth}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-surface-500">Size:</span>
-                                    <span className="text-sm font-medium text-surface-700">{stats.size}</span>
-                                </div>
-                                <div className="flex-1" />
-                                <CopyButton text={result.formatted} variant="full" />
+                            )}
+
+                            {/* Output */}
+                            <div className="relative">
+                                <pre className="p-4 rounded-xl bg-surface-900 text-surface-100 text-sm overflow-x-auto max-h-96">
+                                    <code>{result.formatted}</code>
+                                </pre>
                             </div>
-                        )}
-
-                        {/* Output */}
-                        <div className="relative">
-                            <pre className="p-4 rounded-xl bg-surface-900 text-surface-100 text-sm overflow-x-auto max-h-96">
-                                <code>{result.formatted}</code>
-                            </pre>
                         </div>
-                    </div>
-                </CardResults>
-            )}
+                    </CardResults>
+                )}
 
-            {/* Success State (valid but empty output) */}
-            {result.success && !result.formatted && input.trim() && (
-                <CardResults>
-                    <div className="text-center py-8">
-                        <div className="w-12 h-12 rounded-full bg-success-100 text-success-600 flex items-center justify-center mx-auto mb-3">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                {/* Success State (valid but empty output) */}
+                {result.success && !result.formatted && input.trim() && (
+                    <CardResults>
+                        <div className="text-center py-8">
+                            <div className="w-12 h-12 rounded-full bg-success-100 text-success-600 flex items-center justify-center mx-auto mb-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <p className="text-surface-600">Valid JSON!</p>
                         </div>
-                        <p className="text-surface-600">Valid JSON!</p>
-                    </div>
-                </CardResults>
-            )}
+                    </CardResults>
+                )}
+            </div>
         </Card>
     );
 };

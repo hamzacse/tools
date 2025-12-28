@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardResults } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button, IconButton } from '@/components/ui/Button';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { InfoTooltip } from '@/components/ui/Tooltip';
 import {
     calculateSalary,
@@ -28,8 +29,13 @@ export const SalaryCalculator: React.FC = () => {
         { id: generateId(), name: 'Insurance', value: 100, type: 'fixed' },
     ]);
 
+    // Debounce inputs to improve INP
+    const debouncedGrossSalary = useDebounce(grossSalary, 300);
+    const debouncedAllowances = useDebounce(allowances, 300);
+    const debouncedDeductions = useDebounce(deductions, 300);
+
     const result = useMemo<SalaryResult | null>(() => {
-        const grossNum = parseFloat(grossSalary);
+        const grossNum = parseFloat(debouncedGrossSalary);
 
         if (isNaN(grossNum) || grossNum < 0) {
             return null;
@@ -38,10 +44,10 @@ export const SalaryCalculator: React.FC = () => {
         return calculateSalary({
             grossSalary: grossNum,
             period,
-            allowances: allowances.filter(a => a.value > 0),
-            deductions: deductions.filter(d => d.value > 0),
+            allowances: debouncedAllowances.filter(a => a.value > 0),
+            deductions: debouncedDeductions.filter(d => d.value > 0),
         });
-    }, [grossSalary, period, allowances, deductions]);
+    }, [debouncedGrossSalary, period, debouncedAllowances, debouncedDeductions]);
 
     const addAllowance = () => {
         setAllowances([...allowances, {
@@ -270,84 +276,86 @@ export const SalaryCalculator: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            {result && (
-                <CardResults>
-                    <div className="space-y-6">
-                        {/* Net Salary Highlight */}
-                        <div className="p-6 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white relative overflow-hidden">
-                            <div className="relative z-10 text-center">
-                                <p className="text-sm opacity-90 mb-1">Monthly Net Salary</p>
-                                <div className="flex items-center justify-center gap-2">
-                                    <p className="text-4xl font-bold">
-                                        {formatCurrency(result.monthlyNet, currency)}
+            <div className="min-h-[450px]">
+                {result && (
+                    <CardResults>
+                        <div className="space-y-6">
+                            {/* Net Salary Highlight */}
+                            <div className="p-6 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white relative overflow-hidden">
+                                <div className="relative z-10 text-center">
+                                    <p className="text-sm opacity-90 mb-1">Monthly Net Salary</p>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <p className="text-4xl font-bold">
+                                            {formatCurrency(result.monthlyNet, currency)}
+                                        </p>
+                                        <CopyButton text={result.monthlyNet.toFixed(2)} variant="icon" className="text-white hover:bg-white/10 hover:text-white h-8 w-8" />
+                                    </div>
+                                    <p className="text-sm opacity-75 mt-2">
+                                        {formatCurrency(result.yearlyNet, currency)} / year
                                     </p>
-                                    <CopyButton text={result.monthlyNet.toFixed(2)} variant="icon" className="text-white hover:bg-white/10 hover:text-white h-8 w-8" />
                                 </div>
-                                <p className="text-sm opacity-75 mt-2">
-                                    {formatCurrency(result.yearlyNet, currency)} / year
-                                </p>
+                                {/* Decorative background elements */}
+                                <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                                <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
                             </div>
-                            {/* Decorative background elements */}
-                            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                            <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
-                        </div>
 
-                        {/* Summary */}
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="p-4 rounded-xl bg-surface-50 text-center">
-                                <p className="text-xs text-surface-500 mb-1">Gross</p>
-                                <p className="text-lg font-semibold text-surface-900">
-                                    {formatCurrency(result.grossSalary, currency)}
-                                </p>
+                            {/* Summary */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="p-4 rounded-xl bg-surface-50 text-center">
+                                    <p className="text-xs text-surface-500 mb-1">Gross</p>
+                                    <p className="text-lg font-semibold text-surface-900">
+                                        {formatCurrency(result.grossSalary, currency)}
+                                    </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-success-50 text-center">
+                                    <p className="text-xs text-success-600 mb-1">Allowances</p>
+                                    <p className="text-lg font-semibold text-success-700">
+                                        +{formatCurrency(result.totalAllowances, currency)}
+                                    </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-error-50 text-center">
+                                    <p className="text-xs text-error-600 mb-1">Deductions</p>
+                                    <p className="text-lg font-semibold text-error-700">
+                                        -{formatCurrency(result.totalDeductions, currency)}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="p-4 rounded-xl bg-success-50 text-center">
-                                <p className="text-xs text-success-600 mb-1">Allowances</p>
-                                <p className="text-lg font-semibold text-success-700">
-                                    +{formatCurrency(result.totalAllowances, currency)}
-                                </p>
-                            </div>
-                            <div className="p-4 rounded-xl bg-error-50 text-center">
-                                <p className="text-xs text-error-600 mb-1">Deductions</p>
-                                <p className="text-lg font-semibold text-error-700">
-                                    -{formatCurrency(result.totalDeductions, currency)}
-                                </p>
-                            </div>
-                        </div>
 
-                        {/* Detailed Breakdown */}
-                        {(result.breakdown.allowances.length > 0 || result.breakdown.deductions.length > 0) && (
-                            <div className="space-y-4">
-                                {result.breakdown.allowances.length > 0 && (
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-success-700 mb-2">Allowances</h4>
-                                        {result.breakdown.allowances.map((item, index) => (
-                                            <div key={index} className="flex justify-between py-1.5 text-sm">
-                                                <span className="text-surface-600">{item.name}</span>
-                                                <span className="font-medium text-success-600">
-                                                    +{formatCurrency(item.amount, currency)}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                                {result.breakdown.deductions.length > 0 && (
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-error-700 mb-2">Deductions</h4>
-                                        {result.breakdown.deductions.map((item, index) => (
-                                            <div key={index} className="flex justify-between py-1.5 text-sm">
-                                                <span className="text-surface-600">{item.name}</span>
-                                                <span className="font-medium text-error-600">
-                                                    -{formatCurrency(item.amount, currency)}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </CardResults>
-            )}
+                            {/* Detailed Breakdown */}
+                            {(result.breakdown.allowances.length > 0 || result.breakdown.deductions.length > 0) && (
+                                <div className="space-y-4">
+                                    {result.breakdown.allowances.length > 0 && (
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-success-700 mb-2">Allowances</h4>
+                                            {result.breakdown.allowances.map((item, index) => (
+                                                <div key={index} className="flex justify-between py-1.5 text-sm">
+                                                    <span className="text-surface-600">{item.name}</span>
+                                                    <span className="font-medium text-success-600">
+                                                        +{formatCurrency(item.amount, currency)}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {result.breakdown.deductions.length > 0 && (
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-error-700 mb-2">Deductions</h4>
+                                            {result.breakdown.deductions.map((item, index) => (
+                                                <div key={index} className="flex justify-between py-1.5 text-sm">
+                                                    <span className="text-surface-600">{item.name}</span>
+                                                    <span className="font-medium text-error-600">
+                                                        -{formatCurrency(item.amount, currency)}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </CardResults>
+                )}
+            </div>
         </Card>
     );
 };

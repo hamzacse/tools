@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { JwtDecoder } from '@/components/tools/JwtDecoder';
+import { JwtDecoder } from '@/components/tools/DynamicTools';
 import { FAQ } from '@/components/ui/FAQ';
 import { AdSection } from '@/components/ui/AdPlaceholder';
 
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
         description: 'Decode and inspect JWT tokens instantly. Free online tool.',
     },
 };
+
+export const revalidate = 86400; // 24 hours
 
 const faqItems = [
     {

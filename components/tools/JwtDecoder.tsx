@@ -5,6 +5,7 @@ import { Card, CardHeader, CardResults } from '@/components/ui/Card';
 import { Textarea } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { CopyButton } from '@/components/ui/CopyButton';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import {
     decodeJwt,
     isExpired,
@@ -17,12 +18,15 @@ import {
 export const JwtDecoder: React.FC = () => {
     const [token, setToken] = useState<string>('');
 
+    // Debounce token to improve INP
+    const debouncedToken = useDebounce(token, 400);
+
     const result = useMemo<JwtResult>(() => {
-        if (!token.trim()) {
+        if (!debouncedToken.trim()) {
             return { success: true };
         }
-        return decodeJwt(token);
-    }, [token]);
+        return decodeJwt(debouncedToken);
+    }, [debouncedToken]);
 
     const handleSample = () => {
         // Sample JWT token (expired, for demo purposes)
@@ -132,81 +136,83 @@ export const JwtDecoder: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            {result.success && result.header && result.payload && (
-                <CardResults>
-                    <div className="space-y-6">
-                        {/* Expiration Status */}
-                        {result.payload.exp && (
-                            <div className={`p-4 rounded-lg ${isExpired(result.payload) ? 'bg-error-50 border border-error-200' : 'bg-success-50 border border-success-200'}`}>
-                                <div className="flex items-center gap-3">
-                                    {isExpired(result.payload) ? (
-                                        <svg className="w-5 h-5 text-error-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                    <span className={`text-sm font-medium ${isExpired(result.payload) ? 'text-error-700' : 'text-success-700'}`}>
-                                        {getExpirationStatus(result.payload)}
-                                    </span>
+            <div className="min-h-[400px]">
+                {result.success && result.header && result.payload && (
+                    <CardResults>
+                        <div className="space-y-6">
+                            {/* Expiration Status */}
+                            {result.payload.exp && (
+                                <div className={`p-4 rounded-lg ${isExpired(result.payload) ? 'bg-error-50 border border-error-200' : 'bg-success-50 border border-success-200'}`}>
+                                    <div className="flex items-center gap-3">
+                                        {isExpired(result.payload) ? (
+                                            <svg className="w-5 h-5 text-error-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-5 h-5 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        )}
+                                        <span className={`text-sm font-medium ${isExpired(result.payload) ? 'text-error-700' : 'text-success-700'}`}>
+                                            {getExpirationStatus(result.payload)}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Header Section */}
+                            <div>
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-sm font-semibold text-surface-900">Header</h3>
+                                    <CopyButton text={JSON.stringify(result.header, null, 2)} variant="text" />
+                                </div>
+                                <div className="bg-surface-50 rounded-xl p-4">
+                                    {Object.entries(result.header).map(([key, value]) => (
+                                        <ClaimRow key={key} claim={key} value={value} />
+                                    ))}
                                 </div>
                             </div>
-                        )}
 
-                        {/* Header Section */}
-                        <div>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-sm font-semibold text-surface-900">Header</h3>
-                                <CopyButton text={JSON.stringify(result.header, null, 2)} variant="text" />
-                            </div>
-                            <div className="bg-surface-50 rounded-xl p-4">
-                                {Object.entries(result.header).map(([key, value]) => (
-                                    <ClaimRow key={key} claim={key} value={value} />
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Payload Section */}
-                        <div>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-sm font-semibold text-surface-900">Payload</h3>
-                                <CopyButton text={JSON.stringify(result.payload, null, 2)} variant="text" />
-                            </div>
-                            <div className="bg-surface-50 rounded-xl p-4">
-                                {Object.entries(result.payload).map(([key, value]) => (
-                                    <ClaimRow
-                                        key={key}
-                                        claim={key}
-                                        value={value}
-                                        isTimestamp={['exp', 'nbf', 'iat'].includes(key)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Raw JSON */}
-                        <div>
-                            <h3 className="text-sm font-semibold text-surface-900 mb-3">Raw JSON</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-xs text-surface-500 mb-2">Header</p>
-                                    <pre className="p-4 rounded-xl bg-surface-900 text-surface-100 text-xs overflow-x-auto">
-                                        {JSON.stringify(result.header, null, 2)}
-                                    </pre>
+                            {/* Payload Section */}
+                            <div>
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-sm font-semibold text-surface-900">Payload</h3>
+                                    <CopyButton text={JSON.stringify(result.payload, null, 2)} variant="text" />
                                 </div>
-                                <div>
-                                    <p className="text-xs text-surface-500 mb-2">Payload</p>
-                                    <pre className="p-4 rounded-xl bg-surface-900 text-surface-100 text-xs overflow-x-auto">
-                                        {JSON.stringify(result.payload, null, 2)}
-                                    </pre>
+                                <div className="bg-surface-50 rounded-xl p-4">
+                                    {Object.entries(result.payload).map(([key, value]) => (
+                                        <ClaimRow
+                                            key={key}
+                                            claim={key}
+                                            value={value}
+                                            isTimestamp={['exp', 'nbf', 'iat'].includes(key)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Raw JSON */}
+                            <div>
+                                <h3 className="text-sm font-semibold text-surface-900 mb-3">Raw JSON</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs text-surface-500 mb-2">Header</p>
+                                        <pre className="p-4 rounded-xl bg-surface-900 text-surface-100 text-xs overflow-x-auto">
+                                            {JSON.stringify(result.header, null, 2)}
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-surface-500 mb-2">Payload</p>
+                                        <pre className="p-4 rounded-xl bg-surface-900 text-surface-100 text-xs overflow-x-auto">
+                                            {JSON.stringify(result.payload, null, 2)}
+                                        </pre>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </CardResults>
-            )}
+                    </CardResults>
+                )}
+            </div>
         </Card>
     );
 };

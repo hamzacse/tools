@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { JsonFormatter } from '@/components/tools/JsonFormatter';
+import { JsonFormatter } from '@/components/tools/DynamicTools';
 import { FAQ } from '@/components/ui/FAQ';
 import { AdSection } from '@/components/ui/AdPlaceholder';
 
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
         description: 'Beautify, minify, and validate JSON data instantly. Free online tool.',
     },
 };
+
+export const revalidate = 86400; // 24 hours
 
 const faqItems = [
     {

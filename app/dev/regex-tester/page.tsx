@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { RegexTester } from '@/components/tools/RegexTester';
+import { RegexTester } from '@/components/tools/DynamicTools';
 import { FAQ } from '@/components/ui/FAQ';
 import { AdSection } from '@/components/ui/AdPlaceholder';
 
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
         description: 'Test regex patterns with real-time match highlighting. Free online tool.',
     },
 };
+
+export const revalidate = 86400; // 24 hours
 
 const faqItems = [
     {

@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardResults } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { InfoTooltip } from '@/components/ui/Tooltip';
 import {
     calculateTax,
@@ -19,11 +20,15 @@ export const TaxEstimator: React.FC = () => {
     const [deductions, setDeductions] = useState<string>('0');
     const [selectedCountry, setSelectedCountry] = useState<string>('us');
 
+    // Debounce inputs to improve INP
+    const debouncedIncome = useDebounce(income, 300);
+    const debouncedDeductions = useDebounce(deductions, 300);
+
     const config: TaxConfig = taxConfigs[selectedCountry] || taxConfigs.us;
 
     const result = useMemo<TaxResult | null>(() => {
-        const incomeNum = parseFloat(income);
-        const deductionsNum = parseFloat(deductions) || 0;
+        const incomeNum = parseFloat(debouncedIncome);
+        const deductionsNum = parseFloat(debouncedDeductions) || 0;
 
         if (isNaN(incomeNum) || incomeNum < 0) {
             return null;
@@ -34,7 +39,7 @@ export const TaxEstimator: React.FC = () => {
             deductions: deductionsNum,
             config,
         });
-    }, [income, deductions, config]);
+    }, [debouncedIncome, debouncedDeductions, config]);
 
     const handleReset = () => {
         setIncome('75000');
@@ -117,94 +122,96 @@ export const TaxEstimator: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            {result && (
-                <CardResults>
-                    <div className="space-y-6">
-                        {/* Summary Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="p-4 rounded-xl bg-error-50 dark:bg-error-900/10 border border-error-100 dark:border-error-800">
-                                <div className="flex items-center justify-between mb-1">
-                                    <p className="text-sm text-error-600">Estimated Tax</p>
-                                    <CopyButton text={result.taxAmount.toFixed(2)} variant="icon" className="h-7 w-7" />
+            <div className="min-h-[400px]">
+                {result && (
+                    <CardResults>
+                        <div className="space-y-6">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="p-4 rounded-xl bg-error-50 dark:bg-error-900/10 border border-error-100 dark:border-error-800">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <p className="text-sm text-error-600">Estimated Tax</p>
+                                        <CopyButton text={result.taxAmount.toFixed(2)} variant="icon" className="h-7 w-7" />
+                                    </div>
+                                    <p className="text-2xl font-bold text-error-700 dark:text-error-400">
+                                        {formatTaxCurrency(result.taxAmount, config.currency)}
+                                    </p>
                                 </div>
-                                <p className="text-2xl font-bold text-error-700 dark:text-error-400">
-                                    {formatTaxCurrency(result.taxAmount, config.currency)}
-                                </p>
+                                <div className="p-4 rounded-xl bg-success-50 dark:bg-success-900/10 border border-success-100 dark:border-success-800">
+                                    <p className="text-sm text-success-600 mb-1">Net Income</p>
+                                    <p className="text-2xl font-bold text-success-700 dark:text-success-400">
+                                        {formatTaxCurrency(result.netIncome, config.currency)}
+                                    </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800">
+                                    <p className="text-sm text-primary-600 mb-1">Effective Rate</p>
+                                    <p className="text-2xl font-bold text-primary-700 dark:text-primary-400">
+                                        {result.effectiveRate.toFixed(2)}%
+                                    </p>
+                                </div>
                             </div>
-                            <div className="p-4 rounded-xl bg-success-50 dark:bg-success-900/10 border border-success-100 dark:border-success-800">
-                                <p className="text-sm text-success-600 mb-1">Net Income</p>
-                                <p className="text-2xl font-bold text-success-700 dark:text-success-400">
-                                    {formatTaxCurrency(result.netIncome, config.currency)}
-                                </p>
-                            </div>
-                            <div className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800">
-                                <p className="text-sm text-primary-600 mb-1">Effective Rate</p>
-                                <p className="text-2xl font-bold text-primary-700 dark:text-primary-400">
-                                    {result.effectiveRate.toFixed(2)}%
-                                </p>
-                            </div>
-                        </div>
 
-                        {/* Breakdown Table */}
-                        <div>
-                            <h4 className="text-sm font-semibold text-surface-900 mb-3">Income Breakdown</h4>
-                            <div className="space-y-2">
-                                <div className="flex justify-between py-2 border-b border-surface-100">
-                                    <span className="text-sm text-surface-600">Gross Income</span>
-                                    <span className="text-sm font-medium text-surface-900">
-                                        {formatTaxCurrency(result.grossIncome, config.currency)}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between py-2 border-b border-surface-100">
-                                    <span className="text-sm text-surface-600">Total Deductions</span>
-                                    <span className="text-sm font-medium text-success-600">
-                                        -{formatTaxCurrency(result.totalDeductions, config.currency)}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between py-2 border-b border-surface-100">
-                                    <span className="text-sm text-surface-600">Taxable Income</span>
-                                    <span className="text-sm font-medium text-surface-900">
-                                        {formatTaxCurrency(result.taxableIncome, config.currency)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Tax Slab Breakdown */}
-                        {result.slabBreakdown.length > 0 && (
+                            {/* Breakdown Table */}
                             <div>
-                                <h4 className="text-sm font-semibold text-surface-900 mb-3">Tax by Slab</h4>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="bg-surface-50">
-                                                <th className="text-left py-2 px-3 font-medium text-surface-600">Slab</th>
-                                                <th className="text-right py-2 px-3 font-medium text-surface-600">Rate</th>
-                                                <th className="text-right py-2 px-3 font-medium text-surface-600">Taxable</th>
-                                                <th className="text-right py-2 px-3 font-medium text-surface-600">Tax</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {result.slabBreakdown.map((slab, index) => (
-                                                <tr key={index} className="border-b border-surface-100">
-                                                    <td className="py-2 px-3 text-surface-700">{slab.slab}</td>
-                                                    <td className="py-2 px-3 text-right text-surface-600">{slab.rate}%</td>
-                                                    <td className="py-2 px-3 text-right text-surface-700">
-                                                        {formatTaxCurrency(slab.taxableAmount, config.currency)}
-                                                    </td>
-                                                    <td className="py-2 px-3 text-right font-medium text-surface-900">
-                                                        {formatTaxCurrency(slab.taxAmount, config.currency)}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                <h4 className="text-sm font-semibold text-surface-900 mb-3">Income Breakdown</h4>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between py-2 border-b border-surface-100">
+                                        <span className="text-sm text-surface-600">Gross Income</span>
+                                        <span className="text-sm font-medium text-surface-900">
+                                            {formatTaxCurrency(result.grossIncome, config.currency)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between py-2 border-b border-surface-100">
+                                        <span className="text-sm text-surface-600">Total Deductions</span>
+                                        <span className="text-sm font-medium text-success-600">
+                                            -{formatTaxCurrency(result.totalDeductions, config.currency)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between py-2 border-b border-surface-100">
+                                        <span className="text-sm text-surface-600">Taxable Income</span>
+                                        <span className="text-sm font-medium text-surface-900">
+                                            {formatTaxCurrency(result.taxableIncome, config.currency)}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                </CardResults>
-            )}
+
+                            {/* Tax Slab Breakdown */}
+                            {result.slabBreakdown.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-semibold text-surface-900 mb-3">Tax by Slab</h4>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="bg-surface-50">
+                                                    <th className="text-left py-2 px-3 font-medium text-surface-600">Slab</th>
+                                                    <th className="text-right py-2 px-3 font-medium text-surface-600">Rate</th>
+                                                    <th className="text-right py-2 px-3 font-medium text-surface-600">Taxable</th>
+                                                    <th className="text-right py-2 px-3 font-medium text-surface-600">Tax</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {result.slabBreakdown.map((slab, index) => (
+                                                    <tr key={index} className="border-b border-surface-100">
+                                                        <td className="py-2 px-3 text-surface-700">{slab.slab}</td>
+                                                        <td className="py-2 px-3 text-right text-surface-600">{slab.rate}%</td>
+                                                        <td className="py-2 px-3 text-right text-surface-700">
+                                                            {formatTaxCurrency(slab.taxableAmount, config.currency)}
+                                                        </td>
+                                                        <td className="py-2 px-3 text-right font-medium text-surface-900">
+                                                            {formatTaxCurrency(slab.taxAmount, config.currency)}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </CardResults>
+                )}
+            </div>
 
             {/* Disclaimer */}
             <div className="mt-6 p-4 rounded-lg bg-warning-50 border border-warning-500/20">
